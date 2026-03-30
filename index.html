@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario de Contenido — Iván Cristini</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111;
+    --surface-2: #161616;
+    --surface-3: #1c1c1c;
+    --surface-hover: #1a1a1a;
+    --border: #222;
+    --border-light: #333;
+    --text: #e8e8e8;
+    --text-dim: #888;
+    --text-muted: #555;
+    --accent: #ff6b35;
+    --accent-glow: #ff6b3533;
+    --accent-dim: #ff6b3518;
+    --green: #22c55e;
+    --green-dim: #22c55e22;
+    --ig-pink: #E1306C;
+    --ig-dim: #E1306C22;
+    --yt-red: #FF0000;
+    --yt-dim: #FF000018;
+    --tk-cyan: #00f2ea;
+    --tk-dim: #00f2ea18;
+    --pilar1: #3b82f6;
+    --pilar2: #f59e0b;
+    --pilar3: #ef4444;
+    --pilar4: #a855f7;
+    --pilar5: #22c55e;
+    --formato-video: #ff6b35;
+    --formato-texto: #64748b;
+    --formato-canva: #ec4899;
+    --formato-reel: #06b6d4;
+    --formato-pregunta: #84cc16;
+    --formato-carrusel: #8b5cf6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 48px 40px 36px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 400; line-height: 1.1; letter-spacing: -1px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase; margin-top: 10px;
+  }
+  .header-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .header-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; padding: 5px 12px;
+    border-radius: 3px; letter-spacing: 1px; white-space: nowrap;
+  }
+  .badge-outline { color: var(--accent); border: 1px solid var(--accent); }
+  .badge-filled { color: #000; background: var(--accent); font-weight: 700; }
+  .progress-bar-wrap {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; color: var(--text-dim); letter-spacing: 1px;
+    margin-bottom: 8px; display: flex; justify-content: space-between;
+  }
+  .progress-track {
+    width: 100%; height: 6px; background: var(--surface-3);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 3px; transition: width 0.5s ease;
+  }
+
+  /* MAIN TABS */
+  .main-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .main-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 16px 32px; cursor: pointer; color: var(--text-muted);
+    border: none; background: none;
+    border-bottom: 2px solid transparent; transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .main-tab:hover { color: var(--text-dim); }
+  .main-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .main-panel { display: none; }
+  .main-panel.active { display: block; }
+
+  /* LEGEND */
+  .legend-section { padding: 36px 40px; border-bottom: 1px solid var(--border); }
+  .legend-section h2, .guide-section h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 24px;
+  }
+  .legend-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;
+  }
+  .legend-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 18px;
+  }
+  .legend-card h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 6px; font-size: 0.82rem;
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem; padding: 2px 7px; border-radius: 3px;
+    letter-spacing: 0.5px; text-transform: uppercase; display: inline-block;
+  }
+  .tag-ig { background: var(--ig-dim); color: var(--ig-pink); }
+  .tag-yt { background: var(--yt-dim); color: var(--yt-red); }
+  .tag-tk { background: var(--tk-dim); color: var(--tk-cyan); }
+  .tag-story { background: #ffffff0d; color: #ccc; }
+  .tag-reel { background: var(--formato-reel); color: #000; font-weight: 600; }
+  .tag-feed { background: #f59e0b33; color: #f59e0b; }
+  .tag-video { background: var(--formato-video); color: #000; font-weight: 600; }
+  .tag-texto { background: var(--formato-texto); color: #fff; }
+  .tag-canva { background: var(--formato-canva); color: #000; font-weight: 600; }
+  .tag-vozoff { background: #6366f133; color: #818cf8; }
+  .tag-pregunta { background: var(--formato-pregunta); color: #000; font-weight: 600; }
+  .tag-carrusel { background: var(--formato-carrusel); color: #fff; }
+
+  /* GUIDE */
+  .guide-section { padding: 36px 40px; border-bottom: 1px solid var(--border); }
+  .guide-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;
+  }
+  .guide-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px;
+  }
+  .guide-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+  .guide-card .emoji { font-size: 1.2rem; margin-bottom: 8px; display: block; }
+  .guide-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+  .guide-card .hl { color: var(--accent); font-weight: 500; }
+
+  /* WEEK TABS */
+  .weeks-nav {
+    padding: 24px 40px 0; display: flex; gap: 0;
+    border-bottom: 1px solid var(--border); overflow-x: auto;
+  }
+  .week-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 24px; cursor: pointer; color: var(--text-muted);
+    border-bottom: 2px solid transparent; transition: all 0.3s;
+    white-space: nowrap; background: none; border-top: none;
+    border-left: none; border-right: none;
+  }
+  .week-tab:hover { color: var(--text-dim); }
+  .week-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .week-tab .week-progress {
+    font-size: 0.6rem; display: block; margin-top: 2px; color: var(--text-muted);
+  }
+  .week-tab.active .week-progress { color: var(--accent); }
+  .week-content { display: none; padding: 0 40px 50px; }
+  .week-content.active { display: block; }
+  .week-header {
+    padding: 24px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+  }
+  .week-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.6rem; font-weight: 400; margin-bottom: 4px;
+  }
+  .week-theme { font-size: 0.88rem; color: var(--text-dim); font-style: italic; }
+  .week-focus { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .focus-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+  }
+
+  /* DAY CARDS (collapsible) */
+  .day-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 16px; overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .day-card:hover { border-color: var(--border-light); }
+  .day-card.completed { border-color: var(--green); border-color: #22c55e44; }
+  .day-header {
+    padding: 14px 20px; display: flex; justify-content: space-between;
+    align-items: center; cursor: pointer; user-select: none;
+    transition: background 0.2s;
+  }
+  .day-header:hover { background: var(--surface-hover); }
+  .day-left { display: flex; align-items: center; gap: 12px; }
+  .day-arrow {
+    font-size: 0.7rem; color: var(--text-muted); transition: transform 0.3s;
+    width: 16px; text-align: center;
+  }
+  .day-card.open .day-arrow { transform: rotate(90deg); }
+  .day-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
+  }
+  .day-meta { display: flex; gap: 8px; align-items: center; }
+  .day-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; color: var(--text-muted);
+  }
+  .day-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; color: var(--accent); background: var(--accent-dim);
+    padding: 2px 7px; border-radius: 3px;
+  }
+  .day-done-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; color: var(--green); background: var(--green-dim);
+    padding: 2px 7px; border-radius: 3px; display: none;
+  }
+  .day-card.completed .day-done-badge { display: inline-block; }
+  .day-body {
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+  }
+  .day-card.open .day-body { max-height: 5000px; }
+  .day-body-inner { padding: 4px 20px 20px; }
+
+  /* CONTENT ITEMS with checkbox */
+  .content-item {
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .content-item:last-child { border-bottom: none; }
+  .content-check {
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .content-check input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none;
+    width: 20px; height: 20px; border: 2px solid var(--border-light);
+    border-radius: 4px; cursor: pointer; position: relative;
+    background: var(--surface-2); transition: all 0.2s;
+  }
+  .content-check input[type="checkbox"]:hover { border-color: var(--accent); }
+  .content-check input[type="checkbox"]:checked {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .content-check input[type="checkbox"]:checked::after {
+    content: '✓'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%); color: #000;
+    font-size: 12px; font-weight: 700;
+  }
+  .content-item.done .content-main { opacity: 0.4; }
+  .content-main { flex: 1; min-width: 0; }
+  .content-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+  }
+  .content-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .pilar-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 3px; vertical-align: middle;
+  }
+  .pilar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem; color: var(--text-muted); letter-spacing: 0.5px;
+  }
+  .duration-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem; color: var(--text-muted); background: var(--surface-3);
+    padding: 2px 7px; border-radius: 3px;
+  }
+  .content-text { font-size: 0.9rem; line-height: 1.5; margin-bottom: 8px; }
+  .content-text strong { color: var(--accent); font-weight: 600; }
+  .content-script {
+    background: var(--surface-2); border-left: 3px solid var(--accent);
+    padding: 12px 16px; margin: 8px 0; border-radius: 0 6px 6px 0;
+    font-size: 0.85rem; line-height: 1.55; font-style: italic;
+  }
+
+  /* SPEC BLOCKS (new deeper instructions) */
+  .spec-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-top: 10px;
+  }
+  @media (max-width: 600px) { .spec-grid { grid-template-columns: 1fr; } }
+  .spec-block {
+    background: var(--surface-3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px;
+  }
+  .spec-block .spec-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 4px; display: block;
+  }
+  .spec-block p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.45; }
+  .spec-label-cam { color: var(--formato-video); }
+  .spec-label-edit { color: var(--tk-cyan); }
+  .spec-label-pub { color: var(--ig-pink); }
+  .spec-label-tip { color: var(--pilar2); }
+  .spec-label-hashtag { color: var(--pilar4); }
+  .spec-label-copy { color: var(--green); }
+  .spec-full {
+    grid-column: 1 / -1;
+    background: var(--surface-3); border: 1px dashed var(--border-light);
+    border-radius: 6px; padding: 10px 14px;
+  }
+  .spec-full .spec-label { color: var(--accent); }
+  .spec-full p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.45; }
+
+  /* YOUTUBE CARD */
+  .yt-card {
+    background: linear-gradient(135deg, #1a0000 0%, var(--surface) 100%);
+    border: 1px solid #ff000028; border-radius: 10px;
+    padding: 24px; margin-top: 24px;
+  }
+  .yt-card h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--yt-red); margin-bottom: 10px;
+  }
+  .yt-card .yt-title {
+    font-family: 'Instrument Serif', serif; font-size: 1.3rem; margin-bottom: 6px;
+  }
+  .yt-card .yt-meta {
+    font-size: 0.78rem; color: var(--text-dim); margin-bottom: 14px;
+  }
+  .yt-outline { list-style: none; }
+  .yt-outline li {
+    font-size: 0.82rem; padding: 5px 0;
+    border-bottom: 1px solid #ffffff08; display: flex; gap: 10px;
+  }
+  .yt-outline li:last-child { border-bottom: none; }
+  .yt-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem; color: var(--yt-red); min-width: 44px;
+  }
+  .tk-card {
+    background: linear-gradient(135deg, #001a19 0%, var(--surface) 100%);
+    border: 1px solid #00f2ea28; border-radius: 10px;
+    padding: 20px; margin-top: 12px;
+  }
+  .tk-card h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--tk-cyan); margin-bottom: 8px;
+  }
+  .tk-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+
+  /* ======================== */
+  /* CALENDAR MONTH VIEW      */
+  /* ======================== */
+  .cal-section { padding: 36px 40px 50px; }
+  .cal-months-nav {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+  }
+  .cal-month-btn {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    padding: 6px 14px; border-radius: 4px; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-dim); transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .cal-month-btn:hover { border-color: var(--border-light); color: var(--text); }
+  .cal-month-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  }
+  .cal-day-header {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    text-align: center; padding: 8px 0; color: var(--text-muted);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .cal-day {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px; min-height: 100px;
+    font-size: 0.75rem; position: relative; transition: border-color 0.2s;
+  }
+  .cal-day:hover { border-color: var(--border-light); }
+  .cal-day.empty { background: transparent; border-color: transparent; }
+  .cal-day.today { border-color: var(--accent); }
+  .cal-day-num {
+    font-family: 'Space Mono', monospace; font-size: 0.7rem;
+    font-weight: 700; margin-bottom: 6px; color: var(--text-dim);
+  }
+  .cal-day.today .cal-day-num { color: var(--accent); }
+  .cal-tag {
+    display: block; font-size: 0.55rem; padding: 2px 4px;
+    border-radius: 2px; margin-bottom: 3px;
+    font-family: 'Space Mono', monospace; letter-spacing: 0.3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .cal-tag-story { background: var(--ig-dim); color: var(--ig-pink); }
+  .cal-tag-reel { background: #06b6d433; color: var(--formato-reel); }
+  .cal-tag-yt { background: var(--yt-dim); color: var(--yt-red); }
+  .cal-tag-tk { background: var(--tk-dim); color: var(--tk-cyan); }
+
+  /* FOOTER */
+  .footer {
+    padding: 36px 40px; border-top: 1px solid var(--border); text-align: center;
+  }
+  .footer .quote {
+    font-family: 'Instrument Serif', serif; font-size: 1.1rem;
+    font-style: italic; color: var(--text-dim); margin-bottom: 16px;
+  }
+  .footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .header, .legend-section, .guide-section, .weeks-nav, .week-content,
+    .cal-section, .footer { padding-left: 16px; padding-right: 16px; }
+    .main-tabs { overflow-x: auto; }
+    .main-tab { padding: 14px 20px; font-size: 0.68rem; }
+    .day-header { padding: 12px 14px; }
+    .day-body-inner { padding: 4px 14px 16px; }
+    .cal-day { min-height: 70px; padding: 5px; }
+    .cal-tag { font-size: 0.5rem; }
+  }
+  @media print {
+    body { background: #fff; color: #000; }
+    .week-content { display: block !important; }
+    .day-body { max-height: none !important; }
+    .weeks-nav, .main-tabs, .cal-months-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Calendario de <span>Contenido</span></h1>
+      <div class="header-sub">Iván Cristini — Marca Personal — Mes 1</div>
+    </div>
+    <div class="header-badges">
+      <span class="header-badge badge-outline">30 min / día</span>
+      <span class="header-badge badge-outline">Celular</span>
+      <span class="header-badge badge-filled">Solo</span>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span>PROGRESO DEL MES</span>
+      <span id="progress-text">0 / 0 piezas</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN TABS -->
+<div class="main-tabs">
+  <button class="main-tab active" onclick="showMain('plan')">📋 Plan Semanal</button>
+  <button class="main-tab" onclick="showMain('calendar')">📅 Calendario Mensual</button>
+</div>
+
+<!-- ====================== PLAN PANEL ====================== -->
+<div class="main-panel active" id="panel-plan">
+
+<!-- LEGEND -->
+<div class="legend-section">
+  <h2>Leyenda — Leé esto primero</h2>
+  <div class="legend-grid">
+    <div class="legend-card">
+      <h3>Dónde publicar</h3>
+      <div class="legend-item"><span class="tag tag-ig">IG</span> Instagram</div>
+      <div class="legend-item"><span class="tag tag-yt">YT</span> YouTube</div>
+      <div class="legend-item"><span class="tag tag-tk">TK</span> TikTok</div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+        <div class="legend-item"><span class="tag tag-story">STORY</span> Historia (desaparece en 24hs)</div>
+        <div class="legend-item"><span class="tag tag-reel">REEL</span> Video corto (queda en tu perfil)</div>
+        <div class="legend-item"><span class="tag tag-feed">FEED</span> Publicación fija en tu grilla</div>
+      </div>
+    </div>
+    <div class="legend-card">
+      <h3>Cómo grabarlo / crearlo</h3>
+      <div class="legend-item"><span class="tag tag-video">VIDEO</span> Vos a cámara hablando (celular)</div>
+      <div class="legend-item"><span class="tag tag-texto">TEXTO</span> Texto sobre fondo (directo en IG)</div>
+      <div class="legend-item"><span class="tag tag-canva">CANVA</span> Gráfico hecho en Canva</div>
+      <div class="legend-item"><span class="tag tag-vozoff">VOZ OFF</span> Solo tu voz sobre imagen/video</div>
+      <div class="legend-item"><span class="tag tag-pregunta">ENCUESTA</span> Sticker de encuesta/pregunta</div>
+      <div class="legend-item"><span class="tag tag-carrusel">CARRUSEL</span> Varias imágenes deslizables</div>
+    </div>
+    <div class="legend-card">
+      <h3>Los 5 pilares (de qué hablás)</h3>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pilar1)"></span><strong>P1</strong>&nbsp;Arquitectura de Negocios</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pilar2)"></span><strong>P2</strong>&nbsp;Pensamiento Estratégico</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pilar3)"></span><strong>P3</strong>&nbsp;Psicología del Emprendedor</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pilar4)"></span><strong>P4</strong>&nbsp;Espiritualidad Aplicada</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--pilar5)"></span><strong>P5</strong>&nbsp;Vida Real en Proceso</div>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE -->
+<div class="guide-section">
+  <h2>Tu rutina diaria (30 minutos)</h2>
+  <div class="guide-grid">
+    <div class="guide-card"><span class="emoji">📱</span><h4>Grabá con el celular</h4><p>Cámara frontal. <span class="hl">Sin trípode, sin aro de luz, sin micrófono.</span> Si se ve casero, mejor. Grabá en lugares reales: escritorio, calle, café, caminando.</p></div>
+    <div class="guide-card"><span class="emoji">⏱️</span><h4>Tu rutina</h4><p><span class="hl">5 min:</span> leé qué toca hoy.<br><span class="hl">15 min:</span> grabá o armá en Canva.<br><span class="hl">10 min:</span> publicá + respondé.</p></div>
+    <div class="guide-card"><span class="emoji">🎬</span><h4>Videos: tu truco</h4><p>Te cuesta arrancar. Entonces: <span class="hl">grabá 3 tomas sin pensar.</span> Descartá la 1ra. La 2da o 3ra va a ser buena. No edites. Publicá.</p></div>
+    <div class="guide-card"><span class="emoji">♻️</span><h4>Reutilizá todo</h4><p>Cada <span class="hl">Reel de IG se sube también a TikTok</span> (mismo video). Un video de YouTube se corta en 3-4 Reels. <span class="hl">No crees contenido nuevo, reciclá.</span></p></div>
+    <div class="guide-card"><span class="emoji">🎤</span><h4>Canva: lo mínimo</h4><p>Plantilla <span class="hl">"Instagram Story"</span> → fondo negro → texto blanco → tipografía grande → máximo 3 líneas. Listo.</p></div>
+    <div class="guide-card"><span class="emoji">📊</span><h4>Horarios</h4><p><span class="hl">Stories:</span> 9:00 AM (ARG)<br><span class="hl">Reels:</span> 12-14hs o 19-21hs<br><span class="hl">YouTube:</span> Sábado 18:00<br><span class="hl">TikTok:</span> Mismo que Reel</p></div>
+  </div>
+</div>
+
+<!-- WEEK TABS -->
+<div class="weeks-nav">
+  <button class="week-tab active" onclick="showWeek(1)">Semana 1<span class="week-progress" id="wp-1">0%</span></button>
+  <button class="week-tab" onclick="showWeek(2)">Semana 2<span class="week-progress" id="wp-2">0%</span></button>
+  <button class="week-tab" onclick="showWeek(3)">Semana 3<span class="week-progress" id="wp-3">0%</span></button>
+  <button class="week-tab" onclick="showWeek(4)">Semana 4<span class="week-progress" id="wp-4">0%</span></button>
+</div>
+
+<!-- ============ SEMANA 1 ============ -->
+<div class="week-content active" id="week-1">
+<div class="week-header">
+  <div class="week-title">Semana 1 — Decisiones y Arquitectura</div>
+  <div class="week-theme">"La oportunidad perfecta no existe. Existe la correcta para vos en este momento."</div>
+  <div class="week-focus">
+    <span class="focus-pill" style="background:var(--pilar2)22;color:var(--pilar2)">Pensamiento Estratégico</span>
+    <span class="focus-pill" style="background:var(--pilar1)22;color:var(--pilar1)">Arquitectura de Negocios</span>
+  </div>
+</div>
+
+<!-- S1 LUNES -->
+<div class="day-card" data-week="1" data-day="lun">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left">
+      <span class="day-arrow">▶</span>
+      <span class="day-name">Lunes</span>
+      <span class="day-done-badge">✓ HECHO</span>
+    </div>
+    <div class="day-meta">
+      <span class="day-time">~25 min</span>
+      <span class="day-count">3 piezas</span>
+    </div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-l-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top">
+          <div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div>
+          <div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div>
+        </div>
+        <div class="content-text"><strong>Hook + Reflexión rápida</strong></div>
+        <div class="content-script">"¿Por qué la mayoría de emprendedores dice sí a todo? Porque confunden actividad con progreso. Estar ocupado no es lo mismo que estar avanzando."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>Cámara frontal, mirá al lente. Sentado en tu escritorio o caminando afuera. Grabá 3 tomas, elegí la más natural. No edites.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-pub">📤 Publicar</span><p>Subí directo a IG Stories. Horario: <strong>9:00 AM</strong>. Agregá sticker de ubicación si estás afuera (sube alcance).</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Tono</span><p>Directo, sin sonrisa forzada. Arrancá hablando como si continuaras una conversación, no como si empezaras un discurso.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-hashtag">🏷 Caption / Hashtags</span><p>En Stories no hace falta caption. Si querés, agregá texto chico arriba: "ACTIVIDAD ≠ PROGRESO".</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-item" data-id="s1-l-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top">
+          <div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div>
+          <div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div>
+        </div>
+        <div class="content-text"><strong>Principio directo</strong></div>
+        <div class="content-script">"La oportunidad perfecta no existe. Lo que existe es la oportunidad correcta PARA VOS en este momento. Si esperás la perfecta, no hacés nada."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📝 Cómo hacerlo</span><p>IG → Stories → Crear (Aa) → fondo <strong>negro</strong> → escribí el texto → letra grande. 2 minutos.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Tip</span><p>Poné "PARA VOS" en mayúscula y resaltado para que sea lo que primero se lee. La personalización engancha.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-item" data-id="s1-l-3">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top">
+          <div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">30-45 seg</span></div>
+          <div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div>
+        </div>
+        <div class="content-text"><strong>Reel: "Decir NO es una estrategia"</strong></div>
+        <div class="content-script">"Me llegan varias propuestas por semana. Rechazo la mayoría. No porque sean malas, sino porque no son para mí. La gente cree que decir NO es perder oportunidades. La verdad es que decir SÍ a todo te garantiza no llegar a ningún lado. Tu filtro es tu mejor herramienta."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>Sentado, mirá a cámara. Sin intro ("hola gente"), arrancá directo con la frase. Grabá 2-3 tomas. Elegí la más fluida. No edites nada.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-edit">✂️ Edición</span><p>Cero. Subí el video tal cual. Si querés, ponele subtítulos automáticos en IG (al subir Reel → Subtítulos → Activar). Eso sube retención.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-pub">📤 Publicar</span><p>Subí como Reel en IG (entre 12-14hs o 19-21hs). Después <strong>descargá el Reel sin marca de agua</strong> (en IG → guardar) y subilo a TikTok.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-hashtag">🏷 Caption</span><p>"Tu filtro es tu mejor herramienta. ¿A qué le dijiste NO esta semana?"<br>Hashtags: #emprendedor #mentalidad #decisiones #estrategia #marcapersonal</p></div>
+          <div class="spec-full"><span class="spec-label">🔑 Por qué funciona este Reel</span><p>Abre con una declaración que genera curiosidad ("rechazo la mayoría"). Contradice la creencia popular ("decir NO = perder"). Cierra con un concepto concreto ("tu filtro"). Ese arco retiene atención. En TikTok, el hook de los primeros 3 segundos es clave — la primera frase ya engancha.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- S1 MARTES -->
+<div class="day-card" data-week="1" data-day="mar">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Martes</span><span class="day-done-badge">✓ HECHO</span></div>
+    <div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-ma-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 1/3</span><span class="tag tag-texto">TEXTO</span></div><div><span class="pilar-dot" style="background:var(--pilar1)"></span><span class="pilar-label">P1 — Negocios</span></div></div>
+        <div class="content-text"><strong>Serie narrativa: "El rechazo que me salvó" (parte 1 de 3)</strong></div>
+        <div class="content-script">"Me ofrecieron ser representante comercial de un datacenter. Sonaba perfecto: dinero fijo, estructura, contactos. Lo pensé 24 horas."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📝 Cómo hacerlo</span><p>IG → Stories → Crear (Aa) → fondo negro → texto blanco. Publicá este y los siguientes 2 uno tras otro.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Por qué serie de 3</span><p>La gente toca "siguiente" para ver cómo termina. Eso le dice al algoritmo que tu contenido retiene. Más retención = más alcance.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-ma-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 2/3</span><span class="tag tag-texto">TEXTO</span></div></div>
+        <div class="content-script">"Mi filtro: ¿Esto está alineado con lo que quiero construir? Respuesta: no. Era cambiar mi energía por la de otro. Un trabajo disfrazado de oportunidad."</div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-ma-3">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 3/3</span><span class="tag tag-texto">TEXTO</span></div></div>
+        <div class="content-script">"Dije no. Dos semanas después apareció algo mejor alineado. No siempre pasa. Pero cuando rechazás lo que no es, hacés espacio para lo que sí."</div>
+        <div class="spec-grid">
+          <div class="spec-full"><span class="spec-label">🔑 Cierre de serie</span><p>Este último Story es el que la gente reenvía o responde. Si querés, agregá un sticker de <strong>"Enviar mensaje"</strong> para que te escriban. Cada DM que recibas mejora tu posición en el algoritmo.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- S1 MIÉRCOLES -->
+<div class="day-card" data-week="1" data-day="mie">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Miércoles</span><span class="day-done-badge">✓ HECHO</span></div>
+    <div class="day-meta"><span class="day-time">~30 min</span><span class="day-count">2 piezas</span></div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-mi-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div>
+        <div class="content-text"><strong>Pregunta incómoda + tu respuesta</strong></div>
+        <div class="content-script">"Tu mayor error en decisiones no es lo que elegís. Es no tomar tiempo para elegir. Yo espero 24 horas antes de decir sí a cualquier cosa. En ese tiempo, la verdad aparece."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>Caminando o sentado, lo que fluya. Arrancá con "Tu mayor error..." mirando a cámara. Si te trabás, respirá y empezá de nuevo. No borres, grabá encima.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Tip de autoridad</span><p>Cuando decís "yo espero 24 horas" estás mostrando tu proceso real. Eso posiciona. No es consejo genérico, es tu vida.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-mi-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div>
+        <div class="content-text"><strong>Dato + análisis</strong></div>
+        <div class="content-script">"El 70% de los fracasos empresariales vienen de decisiones apresuradas. No de mercado malo. De cabeza apurada."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">🎨 Paso a paso en Canva</span><p>1. Abrí Canva → buscá "Instagram Story"<br>2. Elegí template oscuro/minimalista<br>3. Poné "70%" gigante arriba (fuente bold)<br>4. Texto chico abajo<br>5. Descargá → subí a Stories</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Por qué funciona</span><p>Los números grandes capturan atención en Stories. La gente para de scrollear cuando ve un dato impactante. El análisis corto después del dato posiciona tu criterio.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- S1 JUEVES -->
+<div class="day-card" data-week="1" data-day="jue">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Jueves</span><span class="day-done-badge">✓ HECHO</span></div>
+    <div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">2 piezas</span></div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-j-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar1)"></span><span class="pilar-label">P1 — Negocios</span></div></div>
+        <div class="content-text"><strong>Comparación / Contraste</strong></div>
+        <div class="content-script">"FORZAR LA DECISIÓN vs DEJAR QUE SE ACLARE. Una te destruye. La otra te alinea."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">🎨 Canva</span><p>Story dividida en 2 mitades. Izquierda: "FORZAR" en rojo. Derecha: "DEJAR QUE SE ACLARE" en blanco. Abajo texto breve. Fondo negro.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Formato VS</span><p>Este formato siempre funciona porque activa el "¿cuál soy yo?" en la cabeza del lector. Es engagement automático.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-j-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div>
+        <div class="content-text"><strong>Interacción con audiencia</strong></div>
+        <div class="content-script">"¿Cuánto tiempo esperás antes de tomar una decisión importante?"</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📝 Cómo hacerlo</span><p>IG Story → Sticker de ENCUESTA. Opciones: "Decido al toque" / "Espero al menos 24hs". Fondo negro o foto tuya borrosa de fondo.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Por qué encuestas</span><p>Cada voto cuenta como interacción. El algoritmo de IG prioriza cuentas que generan interacción en Stories. 1 encuesta bien hecha = más alcance en tus próximos Stories.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- S1 VIERNES -->
+<div class="day-card" data-week="1" data-day="vie">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Viernes</span><span class="day-done-badge">✓ HECHO</span></div>
+    <div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-v-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div>
+        <div class="content-text"><strong>Vulnerable / Confesión</strong></div>
+        <div class="content-script">"A veces sigo queriendo decir sí a todo. Me tienta el dinero fácil. Siento que me pierdo algo si digo que no. Pero sé que esa energía de 'quiero todo' es la misma que me destruyó."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>Lugar tranquilo. Mirá a cámara. Hablá lento. No sonrías forzado. La vulnerabilidad se siente, no se actúa. Este es el video más importante de la semana.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Por qué la vulnerabilidad funciona</span><p>La gente está harta de "gurús" que nunca dudan. Cuando mostrás tu lucha real, generás confianza instantánea. Esto convierte seguidores en audiencia leal.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-v-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div>
+        <div class="content-script">"La diferencia entre yo hace 5 años y yo ahora: ahora reconozco el impulso antes de actuar. Eso no es perfección. Es práctica."</div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-v-3">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">30-60 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar5)"></span><span class="pilar-label">P5 — Vida Real</span></div></div>
+        <div class="content-text"><strong>Reel: "Lo que nadie te dice sobre rechazar oportunidades"</strong></div>
+        <div class="content-script">"Rechacé ser parte de una comisión directiva. Rechacé comercializar productos. Rechacé emprender en tiendas digitales. La gente me dijo que estaba loco. Pero cada NO me acercó más a lo que realmente soy. El filtro no es '¿paga bien?' El filtro es: '¿es coherente con lo que estoy construyendo?'"</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>Mirá a cámara. Listá los rechazos RÁPIDO (genera impacto de acumulación). Después bajá la velocidad para la reflexión final. El contraste de ritmo retiene.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-edit">✂️ Edición</span><p>Subtítulos automáticos de IG activados. Si tenés ganas, podés cortar los silencios en la app de IG al subir. Pero no hace falta.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-pub">📤 Publicar</span><p>IG Reel entre 19-21hs (viernes noche = buen engagement). Después el mismo video a TikTok.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-hashtag">🏷 Caption</span><p>"El filtro no es si paga bien. Es si es coherente con lo que estás construyendo. ¿A cuántas cosas dijiste SÍ que deberían haber sido NO?"<br>#negocios #emprendimiento #mentalidad #rechazar #marcapersonal</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- S1 SÁBADO -->
+<div class="day-card" data-week="1" data-day="sab">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Sábado</span><span class="day-done-badge">✓ HECHO</span></div>
+    <div class="day-meta"><span class="day-time">~30 min + YT</span><span class="day-count">2 piezas + YouTube</span></div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-s-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div>
+        <div class="content-text"><strong>Pregunta abierta (genera DMs)</strong></div>
+        <div class="content-script">"¿Cuál fue la última oportunidad que rechazaste? Contame en un mensaje."</div>
+        <div class="spec-grid">
+          <div class="spec-block"><span class="spec-label spec-label-cam">📝 Cómo hacerlo</span><p>Story con sticker de PREGUNTA ABIERTA (el cajoncito donde la gente escribe). Fondo negro. Texto arriba.</p></div>
+          <div class="spec-block"><span class="spec-label spec-label-tip">💡 Estrategia</span><p>Cada DM que recibas = señal positiva al algoritmo. Respondé TODOS los mensajes, aunque sea con un emoji o "gracias por compartir". Esto te pone más visible.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-s-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div>
+        <div class="content-script">"Cuando rechazás lo que no es tuyo, hacés espacio para lo que sí. No es filosofía. Es ley. Pero tenés que confiar."</div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- S1 DOMINGO -->
+<div class="day-card" data-week="1" data-day="dom">
+  <div class="day-header" onclick="toggleDay(this)">
+    <div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Domingo</span><span class="day-done-badge">✓ HECHO</span></div>
+    <div class="day-meta"><span class="day-time">~15 min</span><span class="day-count">2 piezas</span></div>
+  </div>
+  <div class="day-body"><div class="day-body-inner">
+
+    <div class="content-item" data-id="s1-d-1">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div>
+        <div class="content-text"><strong>Cierre semanal</strong></div>
+        <div class="content-script">"Resumen de la semana: la selectividad no es miedo. Es dirección. Decir NO es la estrategia más subestimada que existe."</div>
+      </div>
+    </div>
+    <div class="content-item" data-id="s1-d-2">
+      <div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div>
+      <div class="content-main">
+        <div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div>
+        <div class="content-text"><strong>Anticipo semana siguiente</strong></div>
+        <div class="content-script">"La semana que viene hablamos de psicología: por qué saboteás tu éxito justo cuando está llegando. No te lo pierdas."</div>
+        <div class="spec-grid">
+          <div class="spec-full"><span class="spec-label">🔑 Por qué anticipar</span><p>El anticipo genera expectativa. La gente vuelve a ver tus Stories al día siguiente porque quiere saber de qué vas a hablar. Es retención proactiva.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- YT S1 -->
+<div class="yt-card">
+  <h3>▶ YouTube — Video de la semana</h3>
+  <div class="yt-title">"Cómo evalúo una oportunidad sin certeza"</div>
+  <div class="yt-meta">Duración: 7 min &bull; Celular apoyado, vos sentado &bull; Subir: Sábado 18:00</div>
+  <ul class="yt-outline">
+    <li><span class="yt-time">0:00</span>"La mayoría falla en decisiones. No por falta de opciones. Por exceso."</li>
+    <li><span class="yt-time">0:30</span>Tu filtro de alineación (Vía Ivánica): ¿es coherente con lo que estoy construyendo?</li>
+    <li><span class="yt-time">2:30</span>El análisis de impacto: ¿qué pasa si digo sí vs si digo no? (espero 24-48hs)</li>
+    <li><span class="yt-time">4:30</span>El gut check: esa claridad mental repentina cuando la respuesta es NO</li>
+    <li><span class="yt-time">6:00</span>Cierre: "Confiá en tu proceso. No en tu ansiedad."</li>
+  </ul>
+  <div class="spec-grid" style="margin-top:14px;">
+    <div class="spec-block"><span class="spec-label spec-label-cam">📹 Setup</span><p>Celular apoyado en libros/taza. Sentado en lugar cómodo sin ruido. Luz natural de frente (ventana). No uses luz artificial rara.</p></div>
+    <div class="spec-block"><span class="spec-label spec-label-edit">✂️ Edición</span><p>Grabá de corrido. Si te trabás, seguí. Los "errores" te hacen humano. No edites. Subilo tal cual. Si querés, cortá un fragmento de 30-60 seg para un Reel/TikTok extra.</p></div>
+    <div class="spec-block"><span class="spec-label spec-label-pub">📤 Publicar</span><p>YouTube → Sábado 18:00. Título exacto como está arriba. Miniatura: tu cara + texto grande "¿SÍ o NO?" en Canva (buscar template "YouTube Thumbnail").</p></div>
+    <div class="spec-block"><span class="spec-label spec-label-copy">📋 Descripción YT</span><p>"Mi proceso para evaluar oportunidades cuando no hay certeza. 3 filtros que uso para decidir sin arrepentirme."<br>+ links a tu IG y TikTok</p></div>
+  </div>
+</div>
+<div class="tk-card"><h4>🎵 TikTok — Resumen semanal</h4><p><strong>2-3 TikToks:</strong> el Reel del lunes + el del viernes + fragmento cortado del YouTube. No creés nada nuevo para TikTok.</p></div>
+</div>
+
+<!-- ============ SEMANA 2 ============ -->
+<div class="week-content" id="week-2">
+<div class="week-header">
+  <div class="week-title">Semana 2 — Psicología y Espiritualidad</div>
+  <div class="week-theme">"Tu enemigo no es el mercado. Es la versión tuya que todavía cree que no merece."</div>
+  <div class="week-focus">
+    <span class="focus-pill" style="background:var(--pilar3)22;color:var(--pilar3)">Psicología del Emprendedor</span>
+    <span class="focus-pill" style="background:var(--pilar4)22;color:var(--pilar4)">Espiritualidad Aplicada</span>
+  </div>
+</div>
+
+<div class="day-card" data-week="2" data-day="lun"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Lunes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-l-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">12 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div><div class="content-script">"¿Por qué saboteás tu éxito justo cuando está llegando? Porque en algún lugar aprendiste que no merecés estar ahí."</div><div class="spec-grid"><div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>A cámara, directo. Mirá al lente. Hablá despacio. Esta frase tiene que pegar como una piña.</p></div><div class="spec-block"><span class="spec-label spec-label-tip">💡 Tip</span><p>No expliques más. Dejá que la frase respire. A veces el silencio después del mensaje es más poderoso que cualquier explicación.</p></div></div></div></div>
+  <div class="content-item" data-id="s2-l-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Ese 'no merezco' vive en tu cuerpo. Debés sacarlo antes de que vuelva a sabotearte. No es motivación. Es trabajo interno."</div></div></div>
+  <div class="content-item" data-id="s2-l-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">45 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div><div class="content-text"><strong>Reel: "El autosabotaje explicado en 45 segundos"</strong></div><div class="content-script">"El autosabotaje no es debilidad. Es un mecanismo de protección. Tu mente dice: si no lo tengo, no lo pierdo. Si no llego, no me caigo. Entonces te frena justo antes de conseguir lo que querés. La próxima vez que sientas que algo se te escapa cuando iba bien, no busques excusas afuera. Mirá adentro."</div><div class="spec-grid"><div class="spec-block"><span class="spec-label spec-label-cam">📹 Cómo grabar</span><p>Sentado, tranquilo. Tono conversacional, no de maestro. Grabá 2-3 tomas.</p></div><div class="spec-block"><span class="spec-label spec-label-hashtag">🏷 Caption</span><p>"El autosabotaje no es debilidad. Es protección mal dirigida. ¿Te pasó?"<br>#psicología #autosabotaje #emprendedor #mentalidad #crecimientopersonal</p></div></div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="2" data-day="mar"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Martes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-ma-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 1/3</span><span class="tag tag-texto">TEXTO</span></div><div><span class="pilar-dot" style="background:var(--pilar5)"></span><span class="pilar-label">P5 — Vida Real</span></div></div><div class="content-text"><strong>Serie: "La caída que necesitaba"</strong></div><div class="content-script">"Hubo un momento donde empecé a creerme que merecía algo grande. No podía sostenerlo. Se vino abajo."</div></div></div>
+  <div class="content-item" data-id="s2-ma-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 2/3</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Tardé años en entender: el problema no era la oportunidad. Era yo creyendo que era imposible que yo tuviera eso."</div></div></div>
+  <div class="content-item" data-id="s2-ma-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 3/3</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Hoy trabajo eso cada día. No es un problema que se resuelve. Es una práctica. Y eso está bien."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="2" data-day="mie"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Miércoles</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-mi-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div><div class="content-script">"Tu relación con el dinero determina cuánto dinero tenés. No es motivación. Es física. Si por dentro creés que no lo merecés, afuera nunca llega."</div></div></div>
+  <div class="content-item" data-id="s2-mi-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div><div class="content-text"><strong>Concepto: EMMET-YAD</strong></div><div class="content-script">"EMMET-YAD: Tu verdad firma el mundo. Si tu verdad interna dice 'no merezco', tu vida será coherente con esa creencia. No es magia. Es coherencia."</div><div class="spec-grid"><div class="spec-block"><span class="spec-label spec-label-cam">🎨 Canva</span><p>"EMMET-YAD" grande arriba como título en fuente bold. Texto debajo más chico. Fondo oscuro. Podés agregar un sutil glow/resplandor detrás del título.</p></div></div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="2" data-day="jue"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Jueves</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-j-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div><div class="content-text"><strong>Comparación: Disciplina</strong></div><div class="content-script">"DISCIPLINA COMO CASTIGO vs DISCIPLINA COMO COHERENCIA. Si dijiste 'voy a levantarme a las 6', hacerlo no es hábito. Es integridad."</div></div></div>
+  <div class="content-item" data-id="s2-j-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div></div><div class="content-script">"¿Tu disciplina viene del castigo o de la coherencia?"</div><div class="spec-grid"><div class="spec-block"><span class="spec-label spec-label-cam">📝 Encuesta</span><p>Opciones: "Del castigo, si soy honesto" / "De la coherencia"</p></div></div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="2" data-day="vie"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Viernes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-v-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div><div class="content-text"><strong>Vulnerable</strong></div><div class="content-script">"Hay días donde no quiero ser coherente. Donde prefiero lo fácil. La diferencia con antes: ahora puedo elegir lo difícil y sostenerlo."</div></div></div>
+  <div class="content-item" data-id="s2-v-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"No se trata de ser perfecto. Se trata de reconocer el impulso antes de actuar. Eso es madurez. No perfección."</div></div></div>
+  <div class="content-item" data-id="s2-v-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">45 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div><div class="content-text"><strong>Reel: "La espiritualidad no es escape. Es herramienta."</strong></div><div class="content-script">"Conozco gente que medita 2 horas y después no puede tomar una decisión de negocio. Eso no es espiritualidad. Es disociación con incienso. La espiritualidad real es usarla como herramienta: para decidir mejor, para filtrar, para ser coherente."</div><div class="spec-grid"><div class="spec-block"><span class="spec-label spec-label-tip">💡 Tono</span><p>Irónico al principio ("disociación con incienso"), serio al final. No sonrías en la ironía — dejá que la audiencia se ría sola.</p></div><div class="spec-block"><span class="spec-label spec-label-hashtag">🏷 Caption</span><p>"La espiritualidad no es escapar. Es decidir mejor."<br>#espiritualidad #emprendedor #coherencia #mentalidad</p></div></div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="2" data-day="sab"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Sábado</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min + YT</span><span class="day-count">2 piezas + YouTube</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-s-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div></div><div class="content-script">"¿Cuál es la creencia sobre vos mismo que más daño te hizo? La real. La que sentís en el cuerpo."</div></div></div>
+  <div class="content-item" data-id="s2-s-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Esa creencia no es verdad. Es programación. Se puede cambiar. Pero primero tenés que nombrarla."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="2" data-day="dom"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Domingo</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~10 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s2-d-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Resumen: el enemigo nunca fue el mercado. Fuiste vos. Tu psique es el campo de batalla real."</div></div></div>
+  <div class="content-item" data-id="s2-d-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"La semana que viene: cómo dejar de repetir los mismos errores. No es fuerza de voluntad. Es ver el patrón."</div></div></div>
+</div></div></div>
+
+<div class="yt-card"><h3>▶ YouTube — Video de la semana</h3><div class="yt-title">"Los 3 bloqueos mentales que sabotean tu éxito"</div><div class="yt-meta">Duración: 8 min &bull; Celular apoyado &bull; Sábado 18:00</div><ul class="yt-outline"><li><span class="yt-time">0:00</span>"Trabajás en tu negocio. Pero ¿trabajás en tu cabeza?"</li><li><span class="yt-time">0:30</span>Bloqueo 1: "No merezco" — de dónde viene</li><li><span class="yt-time">3:00</span>Bloqueo 2: "Si tengo éxito, me vuelvo como..." — miedo a convertirte</li><li><span class="yt-time">5:00</span>Bloqueo 3: "El éxito es solitario" — te impide pedir ayuda</li><li><span class="yt-time">7:00</span>"Tu psique es el campo de batalla. Arreglala y arreglás tu negocio."</li></ul></div>
+<div class="tk-card"><h4>🎵 TikTok</h4><p><strong>2-3 TikToks:</strong> Reels del lunes y viernes + fragmento del YouTube.</p></div>
+</div>
+
+<!-- ============ SEMANA 3 ============ -->
+<div class="week-content" id="week-3">
+<div class="week-header"><div class="week-title">Semana 3 — Errores y Patrones</div><div class="week-theme">"Tus errores son información, no identidad."</div><div class="week-focus"><span class="focus-pill" style="background:var(--pilar5)22;color:var(--pilar5)">Vida Real</span><span class="focus-pill" style="background:var(--pilar2)22;color:var(--pilar2)">Pensamiento Estratégico</span></div></div>
+
+<div class="day-card" data-week="3" data-day="lun"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Lunes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-l-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">10 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar5)"></span><span class="pilar-label">P5 — Vida Real</span></div></div><div class="content-script">"¿Cuántas veces vas a cometer el mismo error antes de que algo cambie?"</div></div></div>
+  <div class="content-item" data-id="s3-l-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Respuesta: hasta que el dolor de repetirlo sea mayor que el miedo a cambiar. No hay atajo."</div></div></div>
+  <div class="content-item" data-id="s3-l-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">40 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar5)"></span><span class="pilar-label">P5 — Vida Real</span></div></div><div class="content-text"><strong>Reel: "El patrón que me tomó años ver"</strong></div><div class="content-script">"Durante años elegía gente equivocada. Socios, colaboradores, proyectos. Resultado: traición, decepción, pérdida. Pensaba que tenía mala suerte. No. No tenía herramientas para leer personas. El día que desarrollé eso, dejé de elegir mal. No es suerte. Es pattern recognition. Y se entrena."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="3" data-day="mar"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Martes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-ma-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 1/3</span><span class="tag tag-texto">TEXTO</span></div><div><span class="pilar-dot" style="background:var(--pilar5)"></span><span class="pilar-label">P5 — Vida Real</span></div></div><div class="content-text"><strong>Serie: "La misma decisión, 4 veces"</strong></div><div class="content-script">"Año 1, 2, 3, 4. Misma decisión. Elegía proyectos lindos en papel que me destruían en la práctica."</div></div></div>
+  <div class="content-item" data-id="s3-ma-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 2/3</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"El patrón se repite hasta que lo ves. Lo ves hasta que lo rompés. Lo rompés hasta que es nuevo."</div></div></div>
+  <div class="content-item" data-id="s3-ma-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 3/3</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Este mes rechacé algo similar a lo que me destruyó hace 3 años. Pattern recognition en acción."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="3" data-day="mie"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Miércoles</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-mi-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div><div class="content-script">"El pensamiento estratégico no se enseña. Se desarrolla. Requiere cometer errores. Pero si aprendés del error, no necesitás repetirlo."</div></div></div>
+  <div class="content-item" data-id="s3-mi-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div><div class="content-script">"REVERSIBLE → decidí en 10 min. IRREVERSIBLE → tomate 3 días. La mayoría invierte el tiempo en las decisiones equivocadas."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="3" data-day="jue"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Jueves</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-j-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div><div class="content-text"><strong>REACCIÓN vs ESTRATEGIA</strong></div><div class="content-script">"Reacción: algo pasa, actuás al toque, te arrepentís. Estrategia: algo pasa, pausás, pensás, actuás con intención."</div></div></div>
+  <div class="content-item" data-id="s3-j-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div></div><div class="content-script">"¿Cuántas decisiones tomaste esta semana por reacción?"</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="3" data-day="vie"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Viernes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-v-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div><div class="content-text"><strong>Vulnerable</strong></div><div class="content-script">"Todavía me arrepiento de errores de hace 5 años. Aún duelen. Y eso está bien. Significa que creciste lo suficiente para ver el error."</div></div></div>
+  <div class="content-item" data-id="s3-v-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Tu mayor aprendizaje no vino de los éxitos. Vino de las caídas. Pero solo si decidiste ver la caída como información, no como condena."</div></div></div>
+  <div class="content-item" data-id="s3-v-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">50 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar2)"></span><span class="pilar-label">P2 — Pensamiento</span></div></div><div class="content-text"><strong>Reel: "Cómo desarrollar pensamiento estratégico"</strong></div><div class="content-script">"3 pasos: 1) Reconocé el patrón — ¿esto ya me pasó? 2) Entendé por qué lo repetías — ¿qué ganabas? 3) Cambiá la respuesta — no la situación, TU respuesta. Si hacés esto, dejás de ser reactivo."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="3" data-day="sab"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Sábado</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min + YT</span><span class="day-count">2 piezas + YouTube</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-s-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div></div><div class="content-script">"¿Cuál es el error que más repetiste en tu vida? ¿Ya lo rompiste o seguís en loop?"</div></div></div>
+  <div class="content-item" data-id="s3-s-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"El patrón se repite hasta que lo ves. Lo ves hasta que lo rompés. Lo rompés hasta que es nuevo. ¿En qué paso estás?"</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="3" data-day="dom"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Domingo</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~10 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s3-d-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Resumen: tus errores son información, no identidad. Usá la información. Soltá la identidad."</div></div></div>
+  <div class="content-item" data-id="s3-d-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"La semana que viene: cómo construir algo real sin quebrarte. Arquitectura + espiritualidad. La combinación que nadie enseña."</div></div></div>
+</div></div></div>
+
+<div class="yt-card"><h3>▶ YouTube — Video de la semana</h3><div class="yt-title">"Cómo aprender de tus errores (sin repetirlos)"</div><div class="yt-meta">7 min &bull; Sábado 18:00</div><ul class="yt-outline"><li><span class="yt-time">0:00</span>"El error es tu mejor maestro. Pero solo si lo escuchás."</li><li><span class="yt-time">0:30</span>Paso 1: Reconocer el patrón</li><li><span class="yt-time">2:30</span>Paso 2: Entender por qué lo repetías</li><li><span class="yt-time">4:30</span>Paso 3: Cambiar la respuesta</li><li><span class="yt-time">6:00</span>"La inteligencia de ver temprano. Se entrena."</li></ul></div>
+<div class="tk-card"><h4>🎵 TikTok</h4><p><strong>2-3 TikToks:</strong> Reels del lunes y viernes + fragmento del YouTube.</p></div>
+</div>
+
+<!-- ============ SEMANA 4 ============ -->
+<div class="week-content" id="week-4">
+<div class="week-header"><div class="week-title">Semana 4 — Arquitectura + Espiritualidad</div><div class="week-theme">"Lo visible y lo invisible funcionan juntos. O no funciona nada."</div><div class="week-focus"><span class="focus-pill" style="background:var(--pilar1)22;color:var(--pilar1)">Arquitectura</span><span class="focus-pill" style="background:var(--pilar4)22;color:var(--pilar4)">Espiritualidad</span></div></div>
+
+<div class="day-card" data-week="4" data-day="lun"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Lunes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-l-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">12 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar1)"></span><span class="pilar-label">P1 — Negocios</span></div></div><div class="content-script">"¿Podés tener un negocio exitoso y estar vacío por dentro? Sí. Mucha gente lo hace. Y después se quiebra."</div></div></div>
+  <div class="content-item" data-id="s4-l-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Un negocio sin propósito es un trabajo que pagás por el privilegio de hacerlo. Necesitás estructura Y sentido."</div></div></div>
+  <div class="content-item" data-id="s4-l-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">45 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar1)"></span><span class="pilar-label">P1 — Negocios</span></div></div><div class="content-text"><strong>Reel: "Estructura sin alma = prisión"</strong></div><div class="content-script">"Construí negocios que ganaban dinero pero me mataban por dentro. El dinero no llenaba el vacío. Lo hacía más visible. La estructura sin alma es una prisión linda. El propósito sin estructura es fantasía. Necesitás las dos."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="4" data-day="mar"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Martes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-ma-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 1/3</span><span class="tag tag-texto">TEXTO</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div><div class="content-text"><strong>Serie: "La alineación como estrategia"</strong></div><div class="content-script">"Antes tomaba decisiones solo con números. Rentabilidad, margen, escala. Funcionaba en papel. Me destruía en la práctica."</div></div></div>
+  <div class="content-item" data-id="s4-ma-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 2/3</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"Hoy mi primer filtro: ¿está alineado con mi propósito? Si no, los números no importan."</div></div></div>
+  <div class="content-item" data-id="s4-ma-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY 3/3</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"La espiritualidad no reemplaza a la estrategia. La complementa. Propósito + estructura = algo que podés construir Y sostener."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="4" data-day="mie"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Miércoles</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-mi-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar1)"></span><span class="pilar-label">P1 — Negocios</span></div></div><div class="content-script">"Las ideas mueren no porque sean malas. Mueren porque la gente las trata como arte, no como negocio."</div></div></div>
+  <div class="content-item" data-id="s4-mi-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar1)"></span><span class="pilar-label">P1 — Negocios</span></div></div><div class="content-text"><strong>IDEA LINDA vs NEGOCIO REAL</strong></div><div class="content-script">"La idea linda busca aplausos. El negocio real busca clientes que paguen."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="4" data-day="jue"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Jueves</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-j-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div><div><span class="pilar-dot" style="background:var(--pilar3)"></span><span class="pilar-label">P3 — Psicología</span></div></div><div class="content-text"><strong>COHERENCIA vs INCOHERENCIA</strong></div><div class="content-script">"La prueba de si tu negocio está bien construido: ¿podés sostenerlo sin autosabotaje?"</div></div></div>
+  <div class="content-item" data-id="s4-j-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div></div><div class="content-script">"Tu negocio actual: ¿lo podrías sostener 5 años sin quebrarte?"</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="4" data-day="vie"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Viernes</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~25 min</span><span class="day-count">3 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-v-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div><div class="content-text"><strong>Vulnerable</strong></div><div class="content-script">"Hay días donde vuelvo al viejo patrón: quiero el dinero sin el propósito. Me pregunto: ¿cuánto te falta para volver a ese vacío? Nunca es suficiente."</div></div></div>
+  <div class="content-item" data-id="s4-v-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-script">"El dinero es neutro. Es tu relación con él lo que importa. Si lo usás para llenar vacíos, siempre vas a necesitar más."</div></div></div>
+  <div class="content-item" data-id="s4-v-3"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-reel">REEL</span><span class="tag tag-tk">TK</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">50 seg</span></div><div><span class="pilar-dot" style="background:var(--pilar4)"></span><span class="pilar-label">P4 — Espiritualidad</span></div></div><div class="content-text"><strong>Reel: "Ambición + espiritualidad: la tercera opción"</strong></div><div class="content-script">"Te venden que tenés que elegir: o sos ambicioso o sos espiritual. Mentira. Podés querer dinero y tener propósito. La clave es que la estructura sirva al propósito, no al revés."</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="4" data-day="sab"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Sábado</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~20 min + YT</span><span class="day-count">2 piezas + YouTube</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-s-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-canva">CANVA</span></div></div><div class="content-script">"NEGOCIO SIN PROPÓSITO: te destruye. PROPÓSITO SIN NEGOCIO: te deja pobre. AMBOS JUNTOS: lo único que funciona."</div></div></div>
+  <div class="content-item" data-id="s4-s-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-pregunta">ENCUESTA</span></div></div><div class="content-script">"¿Sentís que tu trabajo actual tiene propósito real?"</div></div></div>
+</div></div></div>
+
+<div class="day-card" data-week="4" data-day="dom"><div class="day-header" onclick="toggleDay(this)"><div class="day-left"><span class="day-arrow">▶</span><span class="day-name">Domingo</span><span class="day-done-badge">✓ HECHO</span></div><div class="day-meta"><span class="day-time">~15 min</span><span class="day-count">2 piezas</span></div></div><div class="day-body"><div class="day-body-inner">
+  <div class="content-item" data-id="s4-d-1"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-texto">TEXTO</span></div></div><div class="content-text"><strong>Cierre del mes</strong></div><div class="content-script">"Resumen del mes: tu negocio es el espejo de tu psique. Arreglá adentro y se arregla afuera. No es metáfora."</div></div></div>
+  <div class="content-item" data-id="s4-d-2"><div class="content-check"><input type="checkbox" onchange="onCheck(this)"></div><div class="content-main"><div class="content-top"><div class="content-tags"><span class="tag tag-ig">IG</span><span class="tag tag-story">STORY</span><span class="tag tag-video">VIDEO</span><span class="duration-badge">15 seg</span></div></div><div class="content-text"><strong>Cierre a cámara</strong></div><div class="content-script">"Un mes de contenido. Si llegaste hasta acá, ya sos parte de esto. Gracias por estar."</div><div class="spec-grid"><div class="spec-full"><span class="spec-label">🔑 Cierre del mes</span><p>Mirá a cámara. Agradecé de verdad. Que se sienta. Es el último Story del mes. Si te sale una sonrisa real, mejor. Que no sea actuado.</p></div></div></div></div>
+</div></div></div>
+
+<div class="yt-card"><h3>▶ YouTube — Video de la semana</h3><div class="yt-title">"Cómo alinear ambición con espiritualidad"</div><div class="yt-meta">9 min &bull; Sábado 18:00</div><ul class="yt-outline"><li><span class="yt-time">0:00</span>"El dilema falso: ¿ambición o espiritualidad?"</li><li><span class="yt-time">1:00</span>El dinero es neutro — tu relación con él determina todo</li><li><span class="yt-time">3:30</span>Propósito sin estructura = fantasía</li><li><span class="yt-time">5:30</span>Arquitectura sin alma = prisión</li><li><span class="yt-time">7:30</span>La tercera opción: ambos</li><li><span class="yt-time">8:30</span>"No elijas. Integrá."</li></ul><div class="spec-grid" style="margin-top:14px;"><div class="spec-full"><span class="spec-label">📹 Último video del mes</span><p>Dale importancia. Si podés, grabalo en un lugar diferente (café, afuera). Que se sienta como cierre. Cortá fragmento para Reel/TikTok.</p></div></div></div>
+<div class="tk-card"><h4>🎵 TikTok</h4><p><strong>2-3 TikToks:</strong> Reels + fragmento YouTube. Cerrás el mes con ~10 TikToks sin crear nada extra.</p></div>
+</div>
+
+</div><!-- end panel-plan -->
+
+<!-- ====================== CALENDAR PANEL ====================== -->
+<div class="main-panel" id="panel-calendar">
+  <div class="cal-section">
+    <div id="cal-months-nav" class="cal-months-nav"></div>
+    <div id="cal-grid-container"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="quote">"Consistencia imperfecta > Perfección inconsistente."</div>
+  <p>Iván Cristini — Calendario de Contenido — Mes 1</p>
+</div>
+
+<script>
+// ==================== TABS ====================
+function showMain(panel) {
+  document.querySelectorAll('.main-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
+  document.querySelectorAll('.main-tab').forEach(t => {
+    if ((panel==='plan' && t.textContent.includes('Plan')) || (panel==='calendar' && t.textContent.includes('Calendario')))
+      t.classList.add('active');
+  });
+}
+function showWeek(n) {
+  document.querySelectorAll('.week-content').forEach(w => w.classList.remove('active'));
+  document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('week-' + n).classList.add('active');
+  document.querySelectorAll('.week-tab')[n-1].classList.add('active');
+}
+
+// ==================== COLLAPSIBLE DAYS ====================
+function toggleDay(header) {
+  const card = header.parentElement;
+  card.classList.toggle('open');
+}
+
+// ==================== CHECKBOXES ====================
+const STATE_KEY = 'ivan-cal-checks';
+function loadChecks() {
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(STATE_KEY)) || {}; } catch(e) {}
+  document.querySelectorAll('.content-item[data-id]').forEach(item => {
+    const id = item.dataset.id;
+    const cb = item.querySelector('input[type="checkbox"]');
+    if (data[id]) { cb.checked = true; item.classList.add('done'); }
+  });
+  updateProgress();
+}
+function onCheck(cb) {
+  const item = cb.closest('.content-item');
+  item.classList.toggle('done', cb.checked);
+  saveChecks();
+  updateProgress();
+}
+function saveChecks() {
+  const data = {};
+  document.querySelectorAll('.content-item[data-id]').forEach(item => {
+    const id = item.dataset.id;
+    const cb = item.querySelector('input[type="checkbox"]');
+    if (cb.checked) data[id] = true;
+  });
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+function updateProgress() {
+  const all = document.querySelectorAll('.content-item[data-id]');
+  const done = document.querySelectorAll('.content-item.done');
+  const pct = all.length ? Math.round((done.length / all.length) * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = done.length + ' / ' + all.length + ' piezas (' + pct + '%)';
+
+  // Per-week progress
+  for (let w = 1; w <= 4; w++) {
+    const wAll = document.querySelectorAll('#week-' + w + ' .content-item[data-id]');
+    const wDone = document.querySelectorAll('#week-' + w + ' .content-item.done');
+    const wp = wAll.length ? Math.round((wDone.length / wAll.length) * 100) : 0;
+    const el = document.getElementById('wp-' + w);
+    if (el) el.textContent = wp + '%';
+  }
+
+  // Day completion
+  document.querySelectorAll('.day-card[data-week]').forEach(card => {
+    const items = card.querySelectorAll('.content-item[data-id]');
+    const doneItems = card.querySelectorAll('.content-item.done');
+    card.classList.toggle('completed', items.length > 0 && items.length === doneItems.length);
+  });
+}
+
+// ==================== CALENDAR MONTH VIEW ====================
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS_ES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+// Content plan per day-of-week (0=Mon..6=Sun)
+const WEEK_PLAN = {
+  0: [{t:'Story Video',c:'story'},{t:'Story Texto',c:'story'},{t:'Reel+TikTok',c:'reel'}],
+  1: [{t:'Story 1/3',c:'story'},{t:'Story 2/3',c:'story'},{t:'Story 3/3',c:'story'}],
+  2: [{t:'Story Video',c:'story'},{t:'Story Canva',c:'story'}],
+  3: [{t:'Story Canva',c:'story'},{t:'Story Encuesta',c:'story'}],
+  4: [{t:'Story Video',c:'story'},{t:'Story Texto',c:'story'},{t:'Reel+TikTok',c:'reel'}],
+  5: [{t:'Story Pregunta',c:'story'},{t:'Story Texto',c:'story'},{t:'YouTube',c:'yt'}],
+  6: [{t:'Story Cierre',c:'story'},{t:'Story Anticipo',c:'story'}]
+};
+
+function buildCalendar(year, month) {
+  const container = document.getElementById('cal-grid-container');
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDow = (firstDay.getDay() + 6) % 7; // Mon=0
+  const today = new Date();
+
+  let html = '<div class="cal-grid">';
+  DAYS_ES.forEach(d => { html += '<div class="cal-day-header">' + d + '</div>'; });
+  for (let i = 0; i < startDow; i++) html += '<div class="cal-day empty"></div>';
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const date = new Date(year, month, d);
+    const dow = (date.getDay() + 6) % 7;
+    const isToday = date.toDateString() === today.toDateString();
+    const plan = WEEK_PLAN[dow] || [];
+    html += '<div class="cal-day' + (isToday ? ' today' : '') + '">';
+    html += '<div class="cal-day-num">' + d + '</div>';
+    plan.forEach(p => {
+      const cls = p.c === 'reel' ? 'cal-tag-reel' : p.c === 'yt' ? 'cal-tag-yt' : 'cal-tag-story';
+      html += '<span class="cal-tag ' + cls + '">' + p.t + '</span>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function buildMonthNav() {
+  const nav = document.getElementById('cal-months-nav');
+  const now = new Date();
+  let html = '';
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const label = MONTHS_ES[d.getMonth()] + ' ' + d.getFullYear();
+    const active = i === 0 ? ' active' : '';
+    html += '<button class="cal-month-btn' + active + '" onclick="selectMonth(this,' + d.getFullYear() + ',' + d.getMonth() + ')">' + label + '</button>';
+  }
+  nav.innerHTML = html;
+  buildCalendar(now.getFullYear(), now.getMonth());
+}
+
+function selectMonth(btn, year, month) {
+  document.querySelectorAll('.cal-month-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildCalendar(year, month);
+}
+
+// ==================== INIT ====================
+loadChecks();
+buildMonthNav();
+</script>
+</body>
+</html>
